@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0B1220">
+<title>PADDOCK GP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,600;1,700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --asphalt:#0B1220;
+  --panel:#131F33;
+  --panel2:#0F1929;
+  --line:#22334D;
+  --ink:#F2F5FA;
+  --muted:#8FA1BC;
+  --red:#E8332A;
+  --purple:#B26CFF;
+  --green:#35D07F;
+  --yellow:#FFC845;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--asphalt);color:var(--ink);font-family:"Barlow",sans-serif;font-size:16px;min-height:100%}
+body{padding-top:var(--sat);padding-bottom:calc(var(--sab) + 24px)}
+h1,h2,h3,.disp{font-family:"Chakra Petch",sans-serif}
+button{font-family:"Chakra Petch",sans-serif;cursor:pointer;border:none}
+input,select,textarea{font-family:"Barlow",sans-serif}
+
+/* ---------- Header ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:2px solid var(--line);position:sticky;top:0;background:rgba(11,18,32,.94);backdrop-filter:blur(8px);z-index:20}
+.logo{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:20px;letter-spacing:.06em}
+.logo b{color:var(--red)}
+.logo .flagchk{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-1px;background:
+  conic-gradient(#fff 0 25%, #0B1220 0 50%, #fff 0 75%, #0B1220 0) 0 0/7px 7px;border:1px solid var(--line)}
+.chip{font-family:"Chakra Petch";font-size:11px;font-weight:600;letter-spacing:.12em;padding:5px 10px;border:1px solid var(--line);color:var(--muted)}
+.chip.live{color:#fff;background:var(--red);border-color:var(--red);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.72}}
+@media (prefers-reduced-motion: reduce){.chip.live{animation:none}}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+.screen{display:none}
+.screen.on{display:block}
+.card-panel{background:var(--panel);border:1px solid var(--line);padding:16px;margin-bottom:14px}
+.eyebrow{font-family:"Chakra Petch";font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.eyebrow .tick{display:inline-block;width:10px;height:2px;background:var(--red);vertical-align:middle;margin-right:8px}
+.subtle{color:var(--muted);font-size:14px;line-height:1.5}
+
+/* ---------- Buttons ---------- */
+.btn{display:block;width:100%;padding:15px;font-size:15px;font-weight:700;font-style:italic;letter-spacing:.08em;text-transform:uppercase;background:var(--red);color:#fff;margin-bottom:10px;
+  clip-path:polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)}
+.btn.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);clip-path:none}
+.btn.mini{width:auto;display:inline-block;padding:9px 16px;font-size:12px;margin:0}
+.btn.purple{background:var(--purple);color:#160B24}
+.btn:disabled{opacity:.45}
+
+/* ---------- Forms ---------- */
+.field{margin-bottom:12px}
+.field label{display:block;font-family:"Chakra Petch";font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.field input,.field select{width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:16px}
+.field input:focus{outline:2px solid var(--red);outline-offset:-1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border:2px solid transparent;cursor:pointer}
+.sw.sel{border-color:#fff;outline:2px solid var(--red)}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.err{color:var(--yellow);font-size:13px;margin-top:6px;min-height:18px}
+
+/* ---------- Carte pilote (signature) ---------- */
+.pcard{position:relative;overflow:hidden;background:linear-gradient(160deg,#1B2A45 0%,var(--panel2) 60%);border:1px solid var(--line);padding:18px 16px 16px;margin-bottom:14px}
+.pcard::before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(115deg, rgba(255,255,255,.022) 0 2px, transparent 2px 6px)}
+.pcard .spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--team,#E8332A)}
+.pcard .bignum{position:absolute;right:-6px;top:-22px;font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:120px;line-height:1;
+  color:transparent;-webkit-text-stroke:2px var(--team,#E8332A);opacity:.5;pointer-events:none;user-select:none}
+.pcard .row{display:flex;gap:12px;align-items:center;position:relative}
+.ph{background:var(--panel);border:1px solid var(--line);overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;color:var(--muted);font-family:"Chakra Petch";font-size:10px;letter-spacing:.1em}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph.pilot{width:76px;height:76px;border-radius:50%}
+.ph.bike{width:110px;height:76px}
+.pcard .nick{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:26px;letter-spacing:.03em;text-transform:uppercase;margin-top:12px;position:relative}
+.pcard .real{font-size:14px;color:var(--muted);position:relative}
+.pcard .teamchip{display:inline-block;margin-top:10px;font-family:"Chakra Petch";font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--team,#E8332A);color:#fff;padding:4px 10px;position:relative;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.pcard .stats{display:flex;gap:18px;margin-top:12px;position:relative}
+.pcard .stat b{font-family:"Chakra Petch";font-size:17px;display:block}
+.pcard .stat span{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+
+/* ---------- Live timing ---------- */
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px}
+.tab{flex:none;font-family:"Chakra Petch";font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:9px 14px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.tab.on{background:var(--ink);color:var(--asphalt);border-color:var(--ink)}
+.trow{display:grid;grid-template-columns:26px 40px 1fr auto;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:none;padding:9px 12px 9px 0;margin-bottom:6px}
+.trow .pos{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:16px;text-align:center;color:var(--muted)}
+.trow .numbox{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:17px;color:#fff;background:var(--team,#555);height:40px;display:flex;align-items:center;justify-content:center}
+.trow .who b{font-family:"Chakra Petch";font-style:italic;font-size:14px;letter-spacing:.02em;text-transform:uppercase;display:block}
+.trow .who span{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.trow .tm{text-align:right}
+.trow .tm b{font-family:"Chakra Petch";font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;display:block}
+.trow .tm span{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.trow.p1 .pos{color:var(--yellow)}
+.trow.best{border:1px solid var(--purple);box-shadow:inset 0 0 0 1px var(--purple)}
+.trow.best .tm b{color:var(--purple)}
+.trow.me{background:#18263E}
+.legend{font-size:11px;color:var(--muted);margin:4px 0 14px}
+.legend i{display:inline-block;width:9px;height:9px;background:var(--purple);margin-right:5px;font-style:normal}
+.refresh{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+
+/* ---------- Records / palmarès ---------- */
+.rec{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--purple);padding:12px 14px;margin-bottom:8px}
+.rec .c b{font-family:"Chakra Petch";font-style:italic;font-size:15px;text-transform:uppercase;display:block}
+.rec .c span{font-size:12px;color:var(--muted)}
+.rec .t{font-family:"Chakra Petch";font-weight:700;font-size:18px;color:var(--purple);font-variant-numeric:tabular-nums}
+
+/* ---------- Podium ---------- */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end;margin:14px 0}
+.pod{background:var(--panel);border:1px solid var(--line);text-align:center;padding:12px 6px}
+.pod .n{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:15px;text-transform:uppercase}
+.pod .t{font-family:"Chakra Petch";font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pod .medal{font-family:"Chakra Petch";font-style:italic;font-weight:700;font-size:26px;margin-bottom:4px}
+.pod.g{padding-top:26px;border-color:var(--yellow)}.pod.g .medal{color:var(--yellow)}
+.pod.s{padding-top:18px}.pod.s .medal{color:#C9D4E4}
+.pod.b{padding-top:12px}.pod.b .medal{color:#D08A4E}
+.banner{background:var(--purple);color:#160B24;font-family:"Chakra Petch";font-weight:700;font-style:italic;text-transform:uppercase;letter-spacing:.06em;text-align:center;padding:12px;margin-bottom:14px}
+
+.toast{position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 16px);background:var(--ink);color:var(--asphalt);font-family:"Chakra Petch";font-weight:600;font-size:14px;padding:13px 16px;z-index:50;display:none;text-align:center}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--muted);border-top-color:var(--red);border-radius:50%;animation:rot .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes rot{to{transform:rotate(360deg)}}
+a{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo"><span class="flagchk"></span>PADDOCK <b>GP</b></div>
+  <div class="chip" id="statusChip">PIT LANE</div>
+</div>
+
+<div class="wrap">
+
+<!-- ================= ACCUEIL ================= -->
+<section class="screen" id="s-home">
+  <div class="card-panel" id="homeGpBox" style="display:none">
+    <div class="eyebrow"><span class="tick"></span>Grand prix en cours</div>
+    <h2 class="disp" id="homeGpName" style="font-style:italic;text-transform:uppercase;margin-bottom:4px">—</h2>
+    <div class="subtle" id="homeGpDates">—</div>
+    <div style="height:12px"></div>
+    <button class="btn" id="btnResume">Entrer dans le paddock</button>
+  </div>
+
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Départ</div>
+    <button class="btn" id="btnJoin">Rejoindre un GP (code)</button>
+    <button class="btn ghost" id="btnSpectate">Mode spectateur</button>
+    <button class="btn ghost" id="btnDirector">Race director</button>
+  </div>
+
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Palmar&egrave;s &mdash; records du patron</div>
+    <div id="recordsList"><div class="subtle">Chargement...</div></div>
+  </div>
+</section>
+
+<!-- ================= PIN DIRECTOR ================= -->
+<section class="screen" id="s-pin">
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Acc&egrave;s race director</div>
+    <div class="field"><label>Code PIN</label><input type="password" inputmode="numeric" id="pinInput" placeholder="****"></div>
+    <div class="err" id="pinErr"></div>
+    <button class="btn" id="btnPinOk">D&eacute;verrouiller</button>
+    <button class="btn ghost" data-back="s-home">Retour</button>
+  </div>
+</section>
+
+<!-- ================= DIRECTOR HUB ================= -->
+<section class="screen" id="s-director">
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Race director</div>
+    <div id="dirCurrent" class="subtle" style="margin-bottom:12px">Aucun GP en cours.</div>
+    <button class="btn" id="btnNewGp">Nouveau grand prix</button>
+    <button class="btn ghost" data-back="s-home">Retour</button>
+  </div>
+</section>
+
+<!-- ================= NOUVEAU GP ================= -->
+<section class="screen" id="s-newgp">
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Nouveau grand prix</div>
+    <div class="field"><label>Circuit</label><input id="gpCircuit" placeholder="Ex : Le Mans Bugatti"></div>
+    <div class="grid2">
+      <div class="field"><label>Du</label><input type="date" id="gpStart"></div>
+      <div class="field"><label>Au</label><input type="date" id="gpEnd"></div>
+    </div>
+    <div class="field"><label>Nombre de jours de roulage</label>
+      <select id="gpDays"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select>
+      <div class="hint">Chaque jour d&eacute;marre avec une session S1. Tu pourras en ajouter en direct.</div>
+    </div>
+    <div class="err" id="gpErr"></div>
+    <button class="btn" id="btnCreateGp">Ouvrir le paddock</button>
+    <button class="btn ghost" data-back="s-director">Retour</button>
+  </div>
+</section>
+
+<!-- ================= REJOINDRE ================= -->
+<section class="screen" id="s-join">
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span><span id="joinTitle">Rejoindre un grand prix</span></div>
+    <div class="field"><label>Code du GP</label><input id="joinCode" placeholder="GP-LEMANS-4F7K" autocapitalize="characters"></div>
+    <div class="err" id="joinErr"></div>
+    <button class="btn" id="btnJoinGo">Valider</button>
+    <button class="btn ghost" data-back="s-home">Retour</button>
+  </div>
+</section>
+
+<!-- ================= PROFIL PILOTE ================= -->
+<section class="screen" id="s-profile">
+  <div class="eyebrow" style="margin-bottom:10px"><span class="tick"></span>Ta carte pilote</div>
+
+  <div class="pcard" id="cardPreview" style="--team:#E8332A">
+    <div class="spine"></div>
+    <div class="bignum" id="cvNum">99</div>
+    <div class="row">
+      <div class="ph pilot" id="cvPhotoPilot">PILOTE</div>
+      <div class="ph bike" id="cvPhotoBike">MOTO</div>
+    </div>
+    <div class="nick" id="cvNick">TON SURNOM</div>
+    <div class="real" id="cvReal">Pr&eacute;nom Nom</div>
+    <div><span class="teamchip" id="cvTeam">&Eacute;curie</span></div>
+    <div class="stats">
+      <div class="stat"><b id="cvBike">&mdash;</b><span>Machine</span></div>
+      <div class="stat"><b id="cvFlag">&mdash;</b><span>Nation</span></div>
+    </div>
+  </div>
+
+  <div class="card-panel">
+    <div class="grid2">
+      <div class="field"><label>Pr&eacute;nom</label><input id="pFirst"></div>
+      <div class="field"><label>Nom</label><input id="pLast"></div>
+    </div>
+    <div class="field"><label>Surnom de course</label><input id="pNick" placeholder="Ex : El Diablo"></div>
+    <div class="grid2">
+      <div class="field"><label>Num&eacute;ro</label><input id="pNum" inputmode="numeric" maxlength="3" placeholder="46"></div>
+      <div class="field"><label>Pays (code)</label><input id="pCountry" maxlength="2" placeholder="CH" autocapitalize="characters"></div>
+    </div>
+    <div class="field"><label>&Eacute;curie / Sponsor</label><input id="pTeam" placeholder="Ex : Repsol Racing"></div>
+    <div class="field"><label>Moto</label><input id="pBike" placeholder="Ex : Ducati Panigale V4"></div>
+    <div class="field"><label>Couleur d&#39;&eacute;quipe</label>
+      <div class="swatches" id="pColors"></div>
+    </div>
+    <div class="field"><label>Photo pilote</label>
+      <input type="file" accept="image/*" id="pPhotoPilotFile">
+      <input id="pPhotoPilotUrl" placeholder="ou colle une URL d&#39;image" style="margin-top:6px">
+    </div>
+    <div class="field"><label>Photo moto</label>
+      <input type="file" accept="image/*" id="pPhotoBikeFile">
+      <input id="pPhotoBikeUrl" placeholder="ou colle une URL d&#39;image" style="margin-top:6px">
+    </div>
+    <div class="err" id="pErr"></div>
+    <button class="btn" id="btnSaveProfile">Rejoindre la grille</button>
+    <button class="btn ghost" data-back="s-home">Retour</button>
+  </div>
+</section>
+
+<!-- ================= LIVE TIMING ================= -->
+<section class="screen" id="s-live">
+  <div class="card-panel" style="padding:12px 16px">
+    <h2 class="disp" id="liveCircuit" style="font-style:italic;text-transform:uppercase;font-size:19px">&mdash;</h2>
+    <div class="subtle" id="liveMeta">&mdash;</div>
+  </div>
+
+  <div class="refresh">
+    <span id="lastSync">&mdash;</span>
+    <button class="btn ghost mini" id="btnRefresh">Actualiser</button>
+  </div>
+
+  <div class="tabs" id="sessionTabs"></div>
+  <div id="timingBoard"></div>
+  <div class="legend"><i></i>Meilleur tour du week-end</div>
+
+  <div class="card-panel" id="myTimeBox" style="display:none">
+    <div class="eyebrow"><span class="tick"></span>Mon chrono</div>
+    <div class="grid2">
+      <div class="field"><label>Session</label><select id="tSession"></select></div>
+      <div class="field"><label>Meilleur tour</label><input id="tTime" placeholder="1:43.256" inputmode="decimal"></div>
+    </div>
+    <div class="err" id="tErr"></div>
+    <button class="btn" id="btnSaveTime">Enregistrer le tour</button>
+    <button class="btn ghost mini" id="btnEditProfile">Modifier ma carte</button>
+  </div>
+
+  <div class="card-panel" id="dirTools" style="display:none">
+    <div class="eyebrow"><span class="tick"></span>Race director</div>
+    <div class="subtle" style="margin-bottom:10px">Code du GP : <b class="disp" id="liveCode">&mdash;</b></div>
+    <div class="field"><label>Ajouter une session</label><input id="newSessionLabel" placeholder="Ex : J2 - Session 3"></div>
+    <button class="btn ghost" id="btnAddSession">Ajouter la session</button>
+    <button class="btn" id="btnFinishGp" style="background:var(--yellow);color:#161006">Fin du GP &mdash; drapeau &agrave; damier</button>
+  </div>
+
+  <button class="btn ghost" data-back="s-home">Quitter le paddock</button>
+</section>
+
+<!-- ================= RESUME / FIN DU GP ================= -->
+<section class="screen" id="s-summary">
+  <div class="banner" id="sumRecordBanner" style="display:none">Nouveau record du patron !</div>
+  <div class="card-panel" style="text-align:center">
+    <div class="eyebrow" style="text-align:center"><span class="tick"></span>Drapeau &agrave; damier</div>
+    <h2 class="disp" id="sumCircuit" style="font-style:italic;text-transform:uppercase">&mdash;</h2>
+    <div class="subtle" id="sumDates">&mdash;</div>
+  </div>
+  <div class="podium" id="sumPodium"></div>
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Classement g&eacute;n&eacute;ral</div>
+    <div id="sumGeneral"></div>
+  </div>
+  <div class="card-panel">
+    <div class="eyebrow"><span class="tick"></span>Vainqueurs par session</div>
+    <div id="sumSessions" class="subtle"></div>
+  </div>
+  <button class="btn ghost" data-back="s-home">Retour au paddock</button>
+</section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+/* =====================================================================
+   CONFIGURATION - a remplir par Loris avant d'offrir (voir README)
+   ===================================================================== */
+var CONFIG = {
+  GH_OWNER: "Loulisse",
+  GH_REPO: "paddock-gp",
+  GH_BRANCH: "main",
+  TOKEN_PART_1: "COLLER_LA_PREMIERE_MOITIE_DU_TOKEN_ICI",
+  TOKEN_PART_2: "COLLER_LA_SECONDE_MOITIE_DU_TOKEN_ICI",
+  DIRECTOR_PIN: "4646",
+  CLOUDINARY_CLOUD: "ddn6im7rn",
+  CLOUDINARY_PRESET: "",
+  POLL_MINUTES: 5
+};
+
+/* ===CORE=== fonctions pures (testees) =================================== */
+function parseTime(str){
+  if(str === null || str === undefined) return null;
+  var s = String(str).trim().replace(",", ".");
+  var m = s.match(/^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$/);
+  if(!m) return null;
+  var min = m[1] ? parseInt(m[1], 10) : 0;
+  var sec = parseInt(m[2], 10);
+  if(m[1] && sec >= 60) return null;
+  var frac = m[3] ? (m[3] + "000").slice(0, 3) : "000";
+  var ms = min * 60000 + sec * 1000 + parseInt(frac, 10);
+  return ms > 0 ? ms : null;
+}
+function formatMs(ms){
+  if(ms === null || ms === undefined) return "-";
+  var min = Math.floor(ms / 60000);
+  var rest = ms - min * 60000;
+  var sec = Math.floor(rest / 1000);
+  var mil = rest - sec * 1000;
+  return min + ":" + String(sec).padStart(2, "0") + "." + String(mil).padStart(3, "0");
+}
+function formatGap(ms){
+  if(ms <= 0) return "LEADER";
+  if(ms < 60000){
+    var s = Math.floor(ms / 1000);
+    var mil = ms - s * 1000;
+    return "+" + s + "." + String(mil).padStart(3, "0");
+  }
+  return "+" + formatMs(ms);
+}
+function bestOfPilot(pilot){
+  var best = null;
+  var times = pilot.times || {};
+  for(var k in times){
+    var t = times[k];
+    if(t && typeof t.ms === "number" && (best === null || t.ms < best)) best = t.ms;
+  }
+  return best;
+}
+function sessionRanking(pilots, sessionId){
+  var rows = [];
+  for(var i = 0; i < pilots.length; i++){
+    var p = pilots[i];
+    var t = (p.times || {})[sessionId];
+    if(t && typeof t.ms === "number") rows.push({ pilot: p, ms: t.ms });
+  }
+  rows.sort(function(a, b){ return a.ms - b.ms; });
+  for(var j = 0; j < rows.length; j++){
+    rows[j].pos = j + 1;
+    rows[j].gap = rows[j].ms - rows[0].ms;
+  }
+  return rows;
+}
+function generalRanking(pilots){
+  var rows = [];
+  for(var i = 0; i < pilots.length; i++){
+    var best = bestOfPilot(pilots[i]);
+    if(best !== null) rows.push({ pilot: pilots[i], ms: best });
+  }
+  rows.sort(function(a, b){ return a.ms - b.ms; });
+  for(var j = 0; j < rows.length; j++){
+    rows[j].pos = j + 1;
+    rows[j].gap = rows[j].ms - rows[0].ms;
+  }
+  return rows;
+}
+function weekendBestMs(pilots){
+  var g = generalRanking(pilots);
+  return g.length ? g[0].ms : null;
+}
+function updateRecord(records, circuit, ms, dateStr, gpCode){
+  if(!records || typeof records !== "object") records = {};
+  if(!records.circuits) records.circuits = {};
+  var key = String(circuit).trim();
+  var cur = records.circuits[key];
+  var beaten = false;
+  var previous = cur ? cur.ms : null;
+  if(ms !== null && (!cur || ms < cur.ms)){
+    var entry = { ms: ms, best: formatMs(ms), date: dateStr, gp: gpCode };
+    entry.history = cur ? [{ ms: cur.ms, best: cur.best, date: cur.date, gp: cur.gp }].concat(cur.history || []) : [];
+    if(entry.history.length > 20) entry.history = entry.history.slice(0, 20);
+    records.circuits[key] = entry;
+    beaten = cur ? true : false;
+  }
+  return { records: records, beaten: beaten, previous: previous, saved: ms !== null && (!cur || ms < cur.ms) };
+}
+function makeGpCode(circuit){
+  var slug = String(circuit).toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "CIRCUIT";
+  var chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  var suf = "";
+  for(var i = 0; i < 4; i++) suf += chars.charAt(Math.floor(Math.random() * chars.length));
+  return "GP-" + slug + "-" + suf;
+}
+function defaultSessions(days){
+  var out = [];
+  for(var d = 1; d <= days; d++) out.push({ id: "j" + d + "s1", label: "J" + d + " - Session 1" });
+  return out;
+}
+function nextSessionId(sessions){
+  var n = 1;
+  var ids = {};
+  for(var i = 0; i < sessions.length; i++) ids[sessions[i].id] = true;
+  while(ids["x" + n]) n++;
+  return "x" + n;
+}
+function flagFromCode(cc){
+  if(!cc || !/^[A-Za-z]{2}$/.test(cc)) return "";
+  var up = cc.toUpperCase();
+  return String.fromCodePoint(0x1F1E6 + up.charCodeAt(0) - 65, 0x1F1E6 + up.charCodeAt(1) - 65);
+}
+/* ===ENDCORE=== ========================================================== */
+
+/* ===================== GitHub API ===================== */
+function ghToken(){ return CONFIG.TOKEN_PART_1 + CONFIG.TOKEN_PART_2; }
+function ghUrl(path){
+  return "https://api.github.com/repos/" + CONFIG.GH_OWNER + "/" + CONFIG.GH_REPO + "/contents/" + path + "?ref=" + CONFIG.GH_BRANCH + "&t=" + Date.now();
+}
+function ghHeaders(){
+  return { "Authorization": "Bearer " + ghToken(), "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+}
+function b64encode(str){
+  var bytes = new TextEncoder().encode(str);
+  var bin = "";
+  for(var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function b64decode(b64){
+  var bin = atob(b64.replace(/\n/g, ""));
+  var bytes = new Uint8Array(bin.length);
+  for(var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function ghGet(path){
+  var r = await fetch(ghUrl(path), { headers: ghHeaders() });
+  if(r.status === 404) return null;
+  if(!r.ok) throw new Error("GitHub GET " + path + " : " + r.status);
+  var data = await r.json();
+  return { json: JSON.parse(b64decode(data.content)), sha: data.sha };
+}
+async function ghList(path){
+  var r = await fetch(ghUrl(path), { headers: ghHeaders() });
+  if(r.status === 404) return [];
+  if(!r.ok) throw new Error("GitHub LIST " + path + " : " + r.status);
+  return await r.json();
+}
+async function ghPut(path, obj, message, sha){
+  var body = { message: message, branch: CONFIG.GH_BRANCH, content: b64encode(JSON.stringify(obj, null, 2)) };
+  if(sha) body.sha = sha;
+  var r = await fetch("https://api.github.com/repos/" + CONFIG.GH_OWNER + "/" + CONFIG.GH_REPO + "/contents/" + path, {
+    method: "PUT", headers: ghHeaders(), body: JSON.stringify(body)
+  });
+  if(r.status === 409 || r.status === 422){
+    var fresh = await ghGet(path);
+    body.sha = fresh ? fresh.sha : undefined;
+    r = await fetch("https://api.github.com/repos/" + CONFIG.GH_OWNER + "/" + CONFIG.GH_REPO + "/contents/" + path, {
+      method: "PUT", headers: ghHeaders(), body: JSON.stringify(body)
+    });
+  }
+  if(!r.ok) throw new Error("GitHub PUT " + path + " : " + r.status);
+  return await r.json();
+}
+async function ghPutSafe(path, obj, message){
+  var cur = await ghGet(path);
+  return ghPut(path, obj, message, cur ? cur.sha : undefined);
+}
+
+/* ===================== Etat & helpers ===================== */
+var S = {
+  role: localStorage.getItem("paddock_role") || "",
+  gp: null, gpCode: "", pilots: [], myId: "", pollTimer: null, editingProfile: false
+};
+var TEAM_COLORS = ["#E8332A", "#1E62D0", "#F97316", "#0FA968", "#8B5CF6", "#E11D8F", "#FFC845", "#0EA5C4", "#64748B", "#111827"];
+function $(id){ return document.getElementById(id); }
+function esc(s){ var d = document.createElement("div"); d.textContent = s === undefined || s === null ? "" : String(s); return d.innerHTML; }
+function toast(msg){ var t = $("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(function(){ t.style.display = "none"; }, 2600); }
+function show(id){
+  var sc = document.querySelectorAll(".screen");
+  for(var i = 0; i < sc.length; i++) sc[i].classList.remove("on");
+  $(id).classList.add("on");
+  window.scrollTo(0, 0);
+  if(id !== "s-live" && S.pollTimer){ clearInterval(S.pollTimer); S.pollTimer = null; }
+}
+function setChip(mode){
+  var c = $("statusChip");
+  c.className = "chip" + (mode === "live" ? " live" : "");
+  c.textContent = mode === "live" ? "LIVE" : (mode === "finished" ? "FINI" : "PIT LANE");
+}
+function myPilotKey(){ return "paddock_pid_" + S.gpCode; }
+function isDirector(){ return localStorage.getItem("paddock_director") === "1"; }
+function todayIso(){ return new Date().toISOString().slice(0, 10); }
+function checkConfigOk(){
+  if(ghToken().indexOf("COLLER") >= 0){
+    toast("Configuration incomplete : token GitHub manquant (voir README).");
+    return false;
+  }
+  return true;
+}
+
+/* ===================== Cloudinary / photos ===================== */
+async function uploadPhoto(file){
+  if(!CONFIG.CLOUDINARY_CLOUD || !CONFIG.CLOUDINARY_PRESET){
+    throw new Error("Cloudinary non configure : colle une URL d'image a la place.");
+  }
+  var fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", CONFIG.CLOUDINARY_PRESET);
+  var r = await fetch("https://api.cloudinary.com/v1_1/" + CONFIG.CLOUDINARY_CLOUD + "/image/upload", { method: "POST", body: fd });
+  if(!r.ok) throw new Error("Echec de l'upload photo (" + r.status + ")");
+  var data = await r.json();
+  return data.secure_url;
+}
+function bindPhotoInput(fileId, urlId, previewId, kind){
+  $(fileId).addEventListener("change", async function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    toast("Upload de la photo...");
+    try{
+      var url = await uploadPhoto(f);
+      $(urlId).value = url;
+      setPhoto(previewId, url, kind);
+      toast("Photo en ligne.");
+    }catch(err){ toast(err.message); }
+  });
+  $(urlId).addEventListener("input", function(){ setPhoto(previewId, $(urlId).value.trim(), kind); });
+}
+function setPhoto(previewId, url, fallback){
+  var el = $(previewId);
+  if(url){ el.innerHTML = "<img src=\"" + esc(url) + "\" alt=\"\">"; }
+  else { el.textContent = fallback; }
+}
+
+/* ===================== Chargement des donnees ===================== */
+async function loadActiveGp(){
+  var idx = await ghGet("data/gp/index.json");
+  if(!idx || !idx.json.active) return null;
+  var code = idx.json.active;
+  var cfg = await ghGet("data/gp/" + code + "/config.json");
+  if(!cfg || cfg.json.status !== "live") return null;
+  return { code: code, config: cfg.json };
+}
+async function loadPilots(code){
+  var files = await ghList("data/gp/" + code + "/pilots");
+  var pilots = [];
+  for(var i = 0; i < files.length; i++){
+    if(files[i].type !== "file") continue;
+    try{
+      var p = await ghGet("data/gp/" + code + "/pilots/" + files[i].name);
+      if(p) pilots.push(p.json);
+    }catch(e){ /* fichier illisible : on ignore */ }
+  }
+  return pilots;
+}
+async function loadRecords(){
+  var r = await ghGet("data/records.json");
+  return r ? r.json : { circuits: {} };
+}
+
+/* ===================== Accueil ===================== */
+async function renderHome(){
+  show("s-home");
+  setChip("");
+  try{
+    var active = await loadActiveGp();
+    if(active){
+      S.gp = active.config; S.gpCode = active.code;
+      $("homeGpBox").style.display = "block";
+      $("homeGpName").textContent = active.config.circuit;
+      $("homeGpDates").textContent = "Du " + active.config.dates.start + " au " + active.config.dates.end + " - code " + active.code;
+      setChip("live");
+    } else {
+      $("homeGpBox").style.display = "none";
+    }
+  }catch(e){ $("homeGpBox").style.display = "none"; }
+  try{
+    var rec = await loadRecords();
+    var keys = Object.keys(rec.circuits || {});
+    if(!keys.length){
+      $("recordsList").innerHTML = "<div class=\"subtle\">Aucun record pour l'instant. Le premier week-end gravera le premier chrono.</div>";
+    } else {
+      keys.sort();
+      var h = "";
+      for(var i = 0; i < keys.length; i++){
+        var c = rec.circuits[keys[i]];
+        h += "<div class=\"rec\"><div class=\"c\"><b>" + esc(keys[i]) + "</b><span>" + esc(c.date) + "</span></div><div class=\"t\">" + esc(c.best) + "</div></div>";
+      }
+      $("recordsList").innerHTML = h;
+    }
+  }catch(e){
+    $("recordsList").innerHTML = "<div class=\"subtle\">Impossible de charger le palmares (config GitHub a verifier).</div>";
+  }
+}
+
+/* ===================== Director ===================== */
+function openDirector(){
+  if(isDirector()){ renderDirector(); return; }
+  $("pinInput").value = ""; $("pinErr").textContent = "";
+  show("s-pin");
+}
+function renderDirector(){
+  show("s-director");
+  $("dirCurrent").innerHTML = S.gpCode && S.gp && S.gp.status === "live"
+    ? "GP en cours : <b>" + esc(S.gp.circuit) + "</b> (code " + esc(S.gpCode) + "). Va sur l'accueil pour entrer dans le paddock."
+    : "Aucun GP en cours. Ouvre un nouveau paddock.";
+}
+async function createGp(){
+  if(!checkConfigOk()) return;
+  var circuit = $("gpCircuit").value.trim();
+  var start = $("gpStart").value, end = $("gpEnd").value;
+  var days = parseInt($("gpDays").value, 10);
+  if(!circuit){ $("gpErr").textContent = "Indique le nom du circuit."; return; }
+  if(!start || !end){ $("gpErr").textContent = "Indique les dates."; return; }
+  $("gpErr").textContent = "";
+  var btn = $("btnCreateGp"); btn.disabled = true;
+  try{
+    var code = makeGpCode(circuit);
+    var config = { code: code, circuit: circuit, dates: { start: start, end: end }, sessions: defaultSessions(days), status: "live", createdAt: new Date().toISOString() };
+    await ghPut("data/gp/" + code + "/config.json", config, "Ouverture " + code);
+    await ghPutSafe("data/gp/index.json", { active: code }, "GP actif : " + code);
+    S.gp = config; S.gpCode = code;
+    toast("Paddock ouvert. Code : " + code);
+    enterProfile();
+  }catch(e){ $("gpErr").textContent = "Erreur GitHub : " + e.message; }
+  btn.disabled = false;
+}
+
+/* ===================== Rejoindre ===================== */
+async function joinGp(asSpectator){
+  if(!checkConfigOk()) return;
+  var code = $("joinCode").value.trim().toUpperCase();
+  if(!code){ $("joinErr").textContent = "Entre le code du GP."; return; }
+  $("joinErr").textContent = "";
+  var btn = $("btnJoinGo"); btn.disabled = true;
+  try{
+    var cfg = await ghGet("data/gp/" + code + "/config.json");
+    if(!cfg){ $("joinErr").textContent = "Code inconnu. Verifie avec le race director."; btn.disabled = false; return; }
+    S.gp = cfg.json; S.gpCode = code;
+    if(cfg.json.status !== "live"){ $("joinErr").textContent = "Ce GP est termine."; btn.disabled = false; return; }
+    if(asSpectator){
+      S.role = "spectator"; localStorage.setItem("paddock_role", "spectator");
+      enterLive();
+    } else {
+      S.role = "pilot"; localStorage.setItem("paddock_role", "pilot");
+      if(localStorage.getItem(myPilotKey())) enterLive(); else enterProfile();
+    }
+  }catch(e){ $("joinErr").textContent = "Erreur GitHub : " + e.message; }
+  btn.disabled = false;
+}
+
+/* ===================== Profil pilote ===================== */
+function renderColorSwatches(sel){
+  var h = "";
+  for(var i = 0; i < TEAM_COLORS.length; i++){
+    h += "<div class=\"sw" + (TEAM_COLORS[i] === sel ? " sel" : "") + "\" data-c=\"" + TEAM_COLORS[i] + "\" style=\"background:" + TEAM_COLORS[i] + "\"></div>";
+  }
+  $("pColors").innerHTML = h;
+}
+function readProfileForm(){
+  return {
+    firstName: $("pFirst").value.trim(),
+    lastName: $("pLast").value.trim(),
+    nickname: $("pNick").value.trim(),
+    number: $("pNum").value.trim(),
+    country: $("pCountry").value.trim().toUpperCase(),
+    team: $("pTeam").value.trim(),
+    bike: $("pBike").value.trim(),
+    color: (document.querySelector(".sw.sel") || {}).dataset ? document.querySelector(".sw.sel").dataset.c : TEAM_COLORS[0],
+    photoPilot: $("pPhotoPilotUrl").value.trim(),
+    photoBike: $("pPhotoBikeUrl").value.trim()
+  };
+}
+function refreshCardPreview(){
+  var p = readProfileForm();
+  $("cardPreview").style.setProperty("--team", p.color || TEAM_COLORS[0]);
+  $("cvNum").textContent = p.number || "99";
+  $("cvNick").textContent = p.nickname || "TON SURNOM";
+  $("cvReal").textContent = ((p.firstName || "Prenom") + " " + (p.lastName || "Nom"));
+  $("cvTeam").textContent = p.team || "Ecurie";
+  $("cvBike").textContent = p.bike || "-";
+  $("cvFlag").textContent = p.country ? (flagFromCode(p.country) + " " + p.country) : "-";
+  setPhoto("cvPhotoPilot", p.photoPilot, "PILOTE");
+  setPhoto("cvPhotoBike", p.photoBike, "MOTO");
+}
+function fillProfileForm(p){
+  $("pFirst").value = p.firstName || ""; $("pLast").value = p.lastName || "";
+  $("pNick").value = p.nickname || ""; $("pNum").value = p.number || "";
+  $("pCountry").value = p.country || ""; $("pTeam").value = p.team || "";
+  $("pBike").value = p.bike || "";
+  $("pPhotoPilotUrl").value = p.photoPilot || ""; $("pPhotoBikeUrl").value = p.photoBike || "";
+  renderColorSwatches(p.color || TEAM_COLORS[0]);
+  refreshCardPreview();
+}
+function enterProfile(){
+  var cached = null;
+  try{ cached = JSON.parse(localStorage.getItem("paddock_profile") || "null"); }catch(e){}
+  fillProfileForm(cached || {});
+  show("s-profile");
+}
+async function saveProfile(){
+  var p = readProfileForm();
+  if(!p.nickname || !p.number){ $("pErr").textContent = "Il faut au minimum un surnom et un numero."; return; }
+  if(!/^\d{1,3}$/.test(p.number)){ $("pErr").textContent = "Le numero doit faire 1 a 3 chiffres."; return; }
+  $("pErr").textContent = "";
+  var btn = $("btnSaveProfile"); btn.disabled = true;
+  try{
+    var pid = localStorage.getItem(myPilotKey());
+    var existing = pid ? await ghGet("data/gp/" + S.gpCode + "/pilots/" + pid + ".json") : null;
+    if(!pid){
+      pid = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      localStorage.setItem(myPilotKey(), pid);
+    }
+    var obj = existing ? existing.json : { id: pid, times: {} };
+    obj.firstName = p.firstName; obj.lastName = p.lastName; obj.nickname = p.nickname;
+    obj.number = p.number; obj.country = p.country; obj.team = p.team; obj.bike = p.bike;
+    obj.color = p.color; obj.photoPilot = p.photoPilot; obj.photoBike = p.photoBike;
+    obj.isDirector = isDirector();
+    obj.updatedAt = new Date().toISOString();
+    await ghPut("data/gp/" + S.gpCode + "/pilots/" + pid + ".json", obj, "Carte pilote " + p.nickname, existing ? existing.sha : undefined);
+    localStorage.setItem("paddock_profile", JSON.stringify(p));
+    S.role = "pilot"; localStorage.setItem("paddock_role", "pilot");
+    toast("Bienvenue sur la grille, " + p.nickname + " !");
+    enterLive();
+  }catch(e){ $("pErr").textContent = "Erreur GitHub : " + e.message; }
+  btn.disabled = false;
+}
+
+/* ===================== Live timing ===================== */
+var currentTab = "general";
+async function enterLive(){
+  show("s-live");
+  setChip("live");
+  $("liveCircuit").textContent = S.gp.circuit;
+  $("liveMeta").textContent = "Du " + S.gp.dates.start + " au " + S.gp.dates.end;
+  $("liveCode").textContent = S.gpCode;
+  $("myTimeBox").style.display = S.role === "pilot" ? "block" : "none";
+  $("dirTools").style.display = isDirector() ? "block" : "none";
+  currentTab = "general";
+  await refreshLive();
+  if(S.pollTimer) clearInterval(S.pollTimer);
+  S.pollTimer = setInterval(refreshLive, CONFIG.POLL_MINUTES * 60000);
+}
+async function refreshLive(){
+  $("lastSync").innerHTML = "<span class=\"spin\"></span>Synchronisation...";
+  try{
+    var cfg = await ghGet("data/gp/" + S.gpCode + "/config.json");
+    if(cfg){ S.gp = cfg.json; }
+    S.pilots = await loadPilots(S.gpCode);
+    if(S.gp.status === "finished"){ await renderSummaryFromArchive(); return; }
+    renderTabs();
+    renderBoard();
+    renderSessionSelect();
+    var d = new Date();
+    $("lastSync").textContent = "A jour - " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + " (auto toutes les " + CONFIG.POLL_MINUTES + " min)";
+  }catch(e){
+    $("lastSync").textContent = "Erreur de synchro : " + e.message;
+  }
+}
+function renderTabs(){
+  var h = "<div class=\"tab" + (currentTab === "general" ? " on" : "") + "\" data-tab=\"general\">General</div>";
+  var ss = S.gp.sessions || [];
+  for(var i = 0; i < ss.length; i++){
+    h += "<div class=\"tab" + (currentTab === ss[i].id ? " on" : "") + "\" data-tab=\"" + esc(ss[i].id) + "\">" + esc(ss[i].label) + "</div>";
+  }
+  $("sessionTabs").innerHTML = h;
+}
+function renderBoard(){
+  var rows = currentTab === "general" ? generalRanking(S.pilots) : sessionRanking(S.pilots, currentTab);
+  var bestWk = weekendBestMs(S.pilots);
+  var myId = localStorage.getItem(myPilotKey());
+  if(!rows.length){
+    $("timingBoard").innerHTML = "<div class=\"card-panel subtle\">Aucun chrono pour l'instant. Le premier tour lance le bal.</div>";
+    return;
+  }
+  var h = "";
+  for(var i = 0; i < rows.length; i++){
+    var r = rows[i], p = r.pilot;
+    var cls = "trow" + (r.pos === 1 ? " p1" : "") + (r.ms === bestWk ? " best" : "") + (p.id === myId ? " me" : "");
+    h += "<div class=\"" + cls + "\">"
+      + "<div class=\"pos\">" + r.pos + "</div>"
+      + "<div class=\"numbox\" style=\"--team:" + esc(p.color || "#555") + "\">" + esc(p.number || "?") + "</div>"
+      + "<div class=\"who\"><b>" + esc(p.nickname || (p.firstName + " " + p.lastName)) + "</b><span>" + esc(p.team || "-") + "</span></div>"
+      + "<div class=\"tm\"><b>" + formatMs(r.ms) + "</b><span>" + (r.pos === 1 ? "LEADER" : formatGap(r.gap)) + "</span></div>"
+      + "</div>";
+  }
+  $("timingBoard").innerHTML = h;
+}
+function renderSessionSelect(){
+  var ss = S.gp.sessions || [];
+  var h = "";
+  for(var i = 0; i < ss.length; i++) h += "<option value=\"" + esc(ss[i].id) + "\">" + esc(ss[i].label) + "</option>";
+  var sel = $("tSession");
+  var prev = sel.value;
+  sel.innerHTML = h;
+  if(prev) sel.value = prev;
+  if(!sel.value && ss.length) sel.value = ss[ss.length - 1].id;
+}
+async function saveMyTime(){
+  var raw = $("tTime").value.trim();
+  var ms = parseTime(raw);
+  if(ms === null){ $("tErr").textContent = "Format attendu : 1:43.256 (ou 58.402)."; return; }
+  var sid = $("tSession").value;
+  if(!sid){ $("tErr").textContent = "Choisis une session."; return; }
+  $("tErr").textContent = "";
+  var pid = localStorage.getItem(myPilotKey());
+  if(!pid){ enterProfile(); return; }
+  var btn = $("btnSaveTime"); btn.disabled = true;
+  try{
+    var cur = await ghGet("data/gp/" + S.gpCode + "/pilots/" + pid + ".json");
+    if(!cur){ toast("Carte pilote introuvable, recree ton profil."); localStorage.removeItem(myPilotKey()); enterProfile(); btn.disabled = false; return; }
+    var obj = cur.json;
+    if(!obj.times) obj.times = {};
+    var old = obj.times[sid];
+    if(old && old.ms < ms){
+      toast("Tour plus lent : " + formatMs(old.ms) + " reste ton meilleur sur cette session.");
+    } else {
+      obj.times[sid] = { ms: ms, raw: formatMs(ms), at: new Date().toISOString() };
+      toast("Chrono enregistre : " + formatMs(ms));
+    }
+    obj.updatedAt = new Date().toISOString();
+    await ghPut("data/gp/" + S.gpCode + "/pilots/" + pid + ".json", obj, "Chrono " + (obj.nickname || pid) + " " + sid, cur.sha);
+    $("tTime").value = "";
+    await refreshLive();
+  }catch(e){ $("tErr").textContent = "Erreur GitHub : " + e.message; }
+  btn.disabled = false;
+}
+async function addSession(){
+  var label = $("newSessionLabel").value.trim();
+  if(!label){ toast("Donne un nom a la session."); return; }
+  try{
+    var cur = await ghGet("data/gp/" + S.gpCode + "/config.json");
+    var cfg = cur.json;
+    cfg.sessions.push({ id: nextSessionId(cfg.sessions), label: label });
+    await ghPut("data/gp/" + S.gpCode + "/config.json", cfg, "Session : " + label, cur.sha);
+    S.gp = cfg;
+    $("newSessionLabel").value = "";
+    renderTabs(); renderSessionSelect();
+    toast("Session ajoutee.");
+  }catch(e){ toast("Erreur : " + e.message); }
+}
+
+/* ===================== Fin du GP ===================== */
+async function finishGp(){
+  if(!confirm("Abaisser le drapeau a damier et clore le GP ? Les chronos seront figes.")) return;
+  var btn = $("btnFinishGp"); btn.disabled = true;
+  toast("Cloture du GP...");
+  try{
+    S.pilots = await loadPilots(S.gpCode);
+    var general = generalRanking(S.pilots);
+    var perSession = {};
+    var ss = S.gp.sessions || [];
+    for(var i = 0; i < ss.length; i++) perSession[ss[i].id] = { label: ss[i].label, ranking: sessionRanking(S.pilots, ss[i].id) };
+
+    var papa = null;
+    for(var j = 0; j < S.pilots.length; j++) if(S.pilots[j].isDirector) papa = S.pilots[j];
+    var papaBest = papa ? bestOfPilot(papa) : null;
+
+    var recCur = await ghGet("data/records.json");
+    var records = recCur ? recCur.json : { circuits: {} };
+    var upd = updateRecord(records, S.gp.circuit, papaBest, todayIso(), S.gpCode);
+    if(upd.saved) await ghPut("data/records.json", upd.records, "Record " + S.gp.circuit, recCur ? recCur.sha : undefined);
+
+    var archive = {
+      code: S.gpCode, circuit: S.gp.circuit, dates: S.gp.dates, finishedAt: new Date().toISOString(),
+      general: general.map(function(r){ return { pos: r.pos, nickname: r.pilot.nickname, number: r.pilot.number, team: r.pilot.team, color: r.pilot.color, ms: r.ms, best: formatMs(r.ms), gap: r.gap }; }),
+      sessions: {}, papaBest: papaBest !== null ? formatMs(papaBest) : null, recordBeaten: upd.beaten, newRecord: upd.saved
+    };
+    for(var k in perSession){
+      archive.sessions[k] = { label: perSession[k].label, winner: perSession[k].ranking.length ? { nickname: perSession[k].ranking[0].pilot.nickname, best: formatMs(perSession[k].ranking[0].ms) } : null };
+    }
+    await ghPutSafe("data/archives/" + S.gpCode + ".json", archive, "Archive " + S.gpCode);
+
+    var cfgCur = await ghGet("data/gp/" + S.gpCode + "/config.json");
+    var cfg = cfgCur.json; cfg.status = "finished"; cfg.finishedAt = archive.finishedAt;
+    await ghPut("data/gp/" + S.gpCode + "/config.json", cfg, "Fin du GP " + S.gpCode, cfgCur.sha);
+    await ghPutSafe("data/gp/index.json", { active: null }, "Fin du GP actif");
+    S.gp = cfg;
+    renderSummary(archive);
+  }catch(e){ toast("Erreur pendant la cloture : " + e.message); }
+  btn.disabled = false;
+}
+function renderSummary(a){
+  show("s-summary");
+  setChip("finished");
+  $("sumCircuit").textContent = a.circuit;
+  $("sumDates").textContent = "Du " + a.dates.start + " au " + a.dates.end + " - " + a.code;
+  if(a.newRecord){
+    $("sumRecordBanner").style.display = "block";
+    $("sumRecordBanner").textContent = a.recordBeaten ? "Record du patron battu : " + a.papaBest + " !" : "Premier record du patron : " + a.papaBest;
+  } else {
+    $("sumRecordBanner").style.display = "none";
+  }
+  var g = a.general || [];
+  var order = [1, 0, 2], cls = ["s", "g", "b"], medal = ["2", "1", "3"];
+  var hp = "";
+  for(var i = 0; i < 3; i++){
+    var r = g[order[i]];
+    hp += "<div class=\"pod " + cls[i] + "\">"
+      + "<div class=\"medal\">" + medal[i] + "</div>"
+      + "<div class=\"n\">" + (r ? esc(r.nickname) : "-") + "</div>"
+      + "<div class=\"t\">" + (r ? r.best : "") + "</div></div>";
+  }
+  $("sumPodium").innerHTML = hp;
+  var hg = "";
+  for(var j = 0; j < g.length; j++){
+    hg += "<div class=\"trow" + (j === 0 ? " p1 best" : "") + "\">"
+      + "<div class=\"pos\">" + g[j].pos + "</div>"
+      + "<div class=\"numbox\" style=\"--team:" + esc(g[j].color || "#555") + "\">" + esc(g[j].number || "?") + "</div>"
+      + "<div class=\"who\"><b>" + esc(g[j].nickname) + "</b><span>" + esc(g[j].team || "-") + "</span></div>"
+      + "<div class=\"tm\"><b>" + g[j].best + "</b><span>" + (j === 0 ? "VAINQUEUR" : formatGap(g[j].gap)) + "</span></div>"
+      + "</div>";
+  }
+  $("sumGeneral").innerHTML = hg || "<div class=\"subtle\">Aucun chrono ce week-end.</div>";
+  var hs = "";
+  for(var k in (a.sessions || {})){
+    var s = a.sessions[k];
+    hs += "<div style=\"margin-bottom:6px\"><b class=\"disp\" style=\"font-style:italic\">" + esc(s.label) + "</b> : " + (s.winner ? esc(s.winner.nickname) + " en " + s.winner.best : "pas de chrono") + "</div>";
+  }
+  $("sumSessions").innerHTML = hs || "Aucune session.";
+}
+async function renderSummaryFromArchive(){
+  try{
+    var a = await ghGet("data/archives/" + S.gpCode + ".json");
+    if(a){ renderSummary(a.json); return; }
+  }catch(e){}
+  toast("Ce GP est termine.");
+  renderHome();
+}
+
+/* ===================== Evenements ===================== */
+document.addEventListener("click", function(e){
+  var t = e.target;
+  if(t.dataset && t.dataset.back){ if(t.dataset.back === "s-home"){ renderHome(); } else { show(t.dataset.back); } return; }
+  if(t.classList.contains("tab")){ currentTab = t.dataset.tab; renderTabs(); renderBoard(); return; }
+  if(t.classList.contains("sw")){
+    var all = document.querySelectorAll(".sw");
+    for(var i = 0; i < all.length; i++) all[i].classList.remove("sel");
+    t.classList.add("sel");
+    refreshCardPreview();
+    return;
+  }
+});
+$("btnJoin").addEventListener("click", function(){ $("joinTitle").textContent = "Rejoindre un grand prix"; $("joinCode").value = S.gpCode || ""; $("joinErr").textContent = ""; S._spec = false; show("s-join"); });
+$("btnSpectate").addEventListener("click", function(){ $("joinTitle").textContent = "Mode spectateur"; $("joinCode").value = S.gpCode || ""; $("joinErr").textContent = ""; S._spec = true; show("s-join"); });
+$("btnJoinGo").addEventListener("click", function(){ joinGp(S._spec); });
+$("btnDirector").addEventListener("click", openDirector);
+$("btnPinOk").addEventListener("click", function(){
+  if($("pinInput").value === CONFIG.DIRECTOR_PIN){ localStorage.setItem("paddock_director", "1"); renderDirector(); }
+  else { $("pinErr").textContent = "PIN incorrect."; }
+});
+$("btnNewGp").addEventListener("click", function(){ if(!checkConfigOk()) return; show("s-newgp"); });
+$("btnCreateGp").addEventListener("click", createGp);
+$("btnResume").addEventListener("click", function(){
+  if(isDirector() || S.role === "pilot"){
+    if(localStorage.getItem(myPilotKey())){ S.role = "pilot"; enterLive(); } else { enterProfile(); }
+  } else if(S.role === "spectator"){ enterLive(); }
+  else { $("joinTitle").textContent = "Rejoindre un grand prix"; $("joinCode").value = S.gpCode; S._spec = false; show("s-join"); }
+});
+$("btnSaveProfile").addEventListener("click", saveProfile);
+$("btnEditProfile").addEventListener("click", function(){
+  var pid = localStorage.getItem(myPilotKey());
+  ghGet("data/gp/" + S.gpCode + "/pilots/" + pid + ".json").then(function(r){
+    if(r) fillProfileForm(r.json); else enterProfile();
+    show("s-profile");
+  }).catch(function(){ enterProfile(); });
+});
+$("btnRefresh").addEventListener("click", refreshLive);
+$("btnSaveTime").addEventListener("click", saveMyTime);
+$("btnAddSession").addEventListener("click", addSession);
+$("btnFinishGp").addEventListener("click", finishGp);
+var formIds = ["pFirst", "pLast", "pNick", "pNum", "pCountry", "pTeam", "pBike"];
+for(var fi = 0; fi < formIds.length; fi++) $(formIds[fi]).addEventListener("input", refreshCardPreview);
+bindPhotoInput("pPhotoPilotFile", "pPhotoPilotUrl", "cvPhotoPilot", "PILOTE");
+bindPhotoInput("pPhotoBikeFile", "pPhotoBikeUrl", "cvPhotoBike", "MOTO");
+
+/* ===================== Init ===================== */
+renderColorSwatches(TEAM_COLORS[0]);
+renderHome();
+</script>
+</body>
+</html>

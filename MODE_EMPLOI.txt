@@ -1,0 +1,51 @@
+============================================================
+  PADDOCK GP - MODE D'EMPLOI
+  Ton paddock personnel, facon MotoGP
+============================================================
+
+POUR LE RACE DIRECTOR (le patron)
+----------------------------------
+1. Ouvre l'application sur ton telephone (mets-la sur ton
+   ecran d'accueil : Partager > Sur l'ecran d'accueil).
+2. Touche "Race director" et entre ton code PIN.
+3. "Nouveau grand prix" : nom du circuit, dates, nombre de
+   jours. L'app te donne un CODE (ex : GP-LEDENON-4F7K).
+4. Donne ce code aux copains du week-end. C'est tout.
+5. Cree ta carte pilote comme les autres, entre tes chronos
+   session par session.
+6. Pendant le week-end tu peux ajouter des sessions depuis
+   le panneau "Race director" en bas du live timing.
+7. Dimanche soir : "Fin du GP - drapeau a damier".
+   -> Podium, resume, et TON meilleur temps du week-end se
+   grave automatiquement dans ton palmares sous le circuit.
+   S'il bat ton record de l'annee passee, tu le sauras.
+
+POUR LES PILOTES INVITES
+----------------------------------
+1. Ouvre le lien de l'app, touche "Rejoindre un GP".
+2. Entre le code donne par le race director.
+3. Cree ta carte pilote : surnom, numero, ecurie, couleur,
+   photos de toi et de ta bete.
+4. Apres chaque session, entre ton meilleur tour au format
+   1:43.256 - l'app garde toujours ton meilleur chrono.
+5. Le live timing se met a jour tout seul toutes les 5 min
+   (bouton "Actualiser" pour forcer).
+6. Le VIOLET = meilleur tour absolu du week-end. La ligne
+   bleutee = toi.
+
+POUR LES SPECTATEURS
+----------------------------------
+Lien de l'app > "Mode spectateur" > code du GP.
+Ils voient tout, ne touchent a rien.
+
+BON A SAVOIR
+----------------------------------
+- Ton palmares (records par circuit) est permanent, d'une
+  annee a l'autre. Les donnees des invites ne durent que le
+  temps du week-end.
+- Ton chrono par session = ton MEILLEUR tour. Si tu entres
+  un temps plus lent, l'app garde l'ancien.
+- Format des temps : 1:43.256 (ou 58.402 si tu es un alien).
+
+Bonne piste, et que le meilleur gagne.
+============================================================
