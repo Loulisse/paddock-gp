@@ -1,16 +1,16 @@
 {
   "id": "pmrxch3syt28i",
   "times": {},
-  "firstName": "",
-  "lastName": "",
+  "firstName": "Stephane",
+  "lastName": "Rohrbach",
   "nickname": "Toot",
   "number": "314",
-  "country": "",
-  "team": "",
-  "bike": "",
+  "country": "SU",
+  "team": "Me-Myself-I",
+  "bike": "CBR 1000 R 2004",
   "color": "#E8332A",
-  "photoPilot": "",
+  "photoPilot": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784812303/vn6qm7oose2uqvl4xclz.jpg",
   "photoBike": "",
   "isDirector": true,
-  "updatedAt": "2026-07-23T10:04:30.466Z"
+  "updatedAt": "2026-07-23T13:13:02.851Z"
 }
