@@ -5,6 +5,11 @@
       "ms": 110525,
       "raw": "1:50.525",
       "at": "2026-07-23T08:28:49.864Z"
+    },
+    "x2": {
+      "ms": 103892,
+      "raw": "1:43.892",
+      "at": "2026-07-23T08:55:10.456Z"
     }
   },
   "firstName": "Inviter",
@@ -18,5 +23,5 @@
   "photoPilot": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794557/aqkrydn7mdj7co3bi10d.jpg",
   "photoBike": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794596/zpq3judwdkwr5qdnoa98.jpg",
   "isDirector": false,
-  "updatedAt": "2026-07-23T08:28:49.864Z"
+  "updatedAt": "2026-07-23T08:55:10.456Z"
 }
