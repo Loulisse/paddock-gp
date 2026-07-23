@@ -281,7 +281,7 @@ a{color:var(--ink)}
 
   <div class="tabs" id="sessionTabs"></div>
   <div id="timingBoard"></div>
-  <div class="legend"><i></i>Meilleur tour du week-end</div>
+  <div class="legend" id="boardLegend"><i></i>Meilleur tour du week-end</div>
 
   <div class="card-panel" id="myTimeBox" style="display:none">
     <div class="eyebrow"><span class="tick"></span>Mon chrono</div>
@@ -423,22 +423,46 @@ function sessionRanking(pilots, sessionId){
   }
   return rows;
 }
-function generalRanking(pilots){
+function generalRanking(pilots, sessions){
+  var ids = [];
+  if(sessions && sessions.length){
+    for(var s = 0; s < sessions.length; s++) ids.push(sessions[s].id);
+  }
   var rows = [];
   for(var i = 0; i < pilots.length; i++){
-    var best = bestOfPilot(pilots[i]);
-    if(best !== null) rows.push({ pilot: pilots[i], ms: best });
+    var p = pilots[i];
+    var times = p.times || {};
+    var total = 0, count = 0, t;
+    if(ids.length){
+      for(var j = 0; j < ids.length; j++){
+        t = times[ids[j]];
+        if(t && typeof t.ms === "number"){ total += t.ms; count++; }
+      }
+    } else {
+      for(var k in times){
+        t = times[k];
+        if(t && typeof t.ms === "number"){ total += t.ms; count++; }
+      }
+    }
+    if(count > 0) rows.push({ pilot: p, ms: total, sessions: count });
   }
-  rows.sort(function(a, b){ return a.ms - b.ms; });
-  for(var j = 0; j < rows.length; j++){
-    rows[j].pos = j + 1;
-    rows[j].gap = rows[j].ms - rows[0].ms;
+  rows.sort(function(a, b){
+    if(b.sessions !== a.sessions) return b.sessions - a.sessions;
+    return a.ms - b.ms;
+  });
+  for(var m = 0; m < rows.length; m++){
+    rows[m].pos = m + 1;
+    rows[m].gap = rows.length && rows[m].sessions === rows[0].sessions ? rows[m].ms - rows[0].ms : null;
   }
   return rows;
 }
 function weekendBestMs(pilots){
-  var g = generalRanking(pilots);
-  return g.length ? g[0].ms : null;
+  var best = null;
+  for(var i = 0; i < pilots.length; i++){
+    var b = bestOfPilot(pilots[i]);
+    if(b !== null && (best === null || b < best)) best = b;
+  }
+  return best;
 }
 function updateRecord(records, circuit, ms, dateStr, gpCode){
   if(!records || typeof records !== "object") records = {};
@@ -835,9 +859,13 @@ function renderTabs(){
   $("sessionTabs").innerHTML = h;
 }
 function renderBoard(){
-  var rows = currentTab === "general" ? generalRanking(S.pilots) : sessionRanking(S.pilots, currentTab);
+  var isGen = currentTab === "general";
+  var rows = isGen ? generalRanking(S.pilots, S.gp.sessions) : sessionRanking(S.pilots, currentTab);
   var bestWk = weekendBestMs(S.pilots);
   var myId = localStorage.getItem(myPilotKey());
+  $("boardLegend").innerHTML = isGen
+    ? "Total cumule de toutes les sessions. Un pilote qui a couru plus de sessions passe devant."
+    : "<i></i>Meilleur tour du week-end";
   if(!rows.length){
     $("timingBoard").innerHTML = "<div class=\"card-panel subtle\">Aucun chrono pour l'instant. Le premier tour lance le bal.</div>";
     return;
@@ -845,12 +873,18 @@ function renderBoard(){
   var h = "";
   for(var i = 0; i < rows.length; i++){
     var r = rows[i], p = r.pilot;
-    var cls = "trow" + (r.pos === 1 ? " p1" : "") + (r.ms === bestWk ? " best" : "") + (p.id === myId ? " me" : "");
+    var cls = "trow" + (r.pos === 1 ? " p1" : "") + (!isGen && r.ms === bestWk ? " best" : "") + (p.id === myId ? " me" : "");
+    var sub;
+    if(isGen){
+      sub = r.gap === null ? r.sessions + " sessions" : (r.pos === 1 ? r.sessions + " sessions" : formatGap(r.gap));
+    } else {
+      sub = r.pos === 1 ? "LEADER" : formatGap(r.gap);
+    }
     h += "<div class=\"" + cls + "\">"
       + "<div class=\"pos\">" + r.pos + "</div>"
       + "<div class=\"numbox\" style=\"--team:" + esc(p.color || "#555") + "\">" + esc(p.number || "?") + "</div>"
       + "<div class=\"who\"><b>" + esc(p.nickname || (p.firstName + " " + p.lastName)) + "</b><span>" + esc(p.team || "-") + "</span></div>"
-      + "<div class=\"tm\"><b>" + formatMs(r.ms) + "</b><span>" + (r.pos === 1 ? "LEADER" : formatGap(r.gap)) + "</span></div>"
+      + "<div class=\"tm\"><b>" + formatMs(r.ms) + "</b><span>" + sub + "</span></div>"
       + "</div>";
   }
   $("timingBoard").innerHTML = h;
@@ -916,7 +950,7 @@ async function finishGp(){
   toast("Cloture du GP...");
   try{
     S.pilots = await loadPilots(S.gpCode);
-    var general = generalRanking(S.pilots);
+    var general = generalRanking(S.pilots, S.gp.sessions);
     var perSession = {};
     var ss = S.gp.sessions || [];
     for(var i = 0; i < ss.length; i++) perSession[ss[i].id] = { label: ss[i].label, ranking: sessionRanking(S.pilots, ss[i].id) };
@@ -932,7 +966,7 @@ async function finishGp(){
 
     var archive = {
       code: S.gpCode, circuit: S.gp.circuit, dates: S.gp.dates, finishedAt: new Date().toISOString(),
-      general: general.map(function(r){ return { pos: r.pos, nickname: r.pilot.nickname, number: r.pilot.number, team: r.pilot.team, color: r.pilot.color, ms: r.ms, best: formatMs(r.ms), gap: r.gap }; }),
+      general: general.map(function(r){ return { pos: r.pos, nickname: r.pilot.nickname, number: r.pilot.number, team: r.pilot.team, color: r.pilot.color, ms: r.ms, best: formatMs(r.ms), gap: r.gap, sessions: r.sessions }; }),
       sessions: {}, papaBest: papaBest !== null ? formatMs(papaBest) : null, recordBeaten: upd.beaten, newRecord: upd.saved
     };
     for(var k in perSession){
@@ -973,11 +1007,12 @@ function renderSummary(a){
   $("sumPodium").innerHTML = hp;
   var hg = "";
   for(var j = 0; j < g.length; j++){
+    var sub = j === 0 ? "VAINQUEUR" : (g[j].gap === null || g[j].gap === undefined ? (g[j].sessions || 0) + " sessions" : formatGap(g[j].gap));
     hg += "<div class=\"trow" + (j === 0 ? " p1 best" : "") + "\">"
       + "<div class=\"pos\">" + g[j].pos + "</div>"
       + "<div class=\"numbox\" style=\"--team:" + esc(g[j].color || "#555") + "\">" + esc(g[j].number || "?") + "</div>"
       + "<div class=\"who\"><b>" + esc(g[j].nickname) + "</b><span>" + esc(g[j].team || "-") + "</span></div>"
-      + "<div class=\"tm\"><b>" + g[j].best + "</b><span>" + (j === 0 ? "VAINQUEUR" : formatGap(g[j].gap)) + "</span></div>"
+      + "<div class=\"tm\"><b>" + g[j].best + "</b><span>" + sub + "</span></div>"
       + "</div>";
   }
   $("sumGeneral").innerHTML = hg || "<div class=\"subtle\">Aucun chrono ce week-end.</div>";
