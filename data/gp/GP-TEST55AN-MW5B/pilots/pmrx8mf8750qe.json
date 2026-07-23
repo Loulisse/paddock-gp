@@ -1,0 +1,16 @@
+{
+  "id": "pmrx8mf8750qe",
+  "times": {},
+  "firstName": "Inviter",
+  "lastName": "Moi",
+  "nickname": "Test",
+  "number": "88",
+  "country": "CH",
+  "team": "VR46",
+  "bike": "Honda GP",
+  "color": "#F97316",
+  "photoPilot": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794557/aqkrydn7mdj7co3bi10d.jpg",
+  "photoBike": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794596/zpq3judwdkwr5qdnoa98.jpg",
+  "isDirector": false,
+  "updatedAt": "2026-07-23T08:16:40.087Z"
+}
