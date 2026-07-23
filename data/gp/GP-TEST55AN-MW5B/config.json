@@ -1,0 +1,16 @@
+{
+  "code": "GP-TEST55AN-MW5B",
+  "circuit": "test-55ans",
+  "dates": {
+    "start": "2026-07-23",
+    "end": "2026-07-23"
+  },
+  "sessions": [
+    {
+      "id": "j1s1",
+      "label": "J1 - Session 1"
+    }
+  ],
+  "status": "live",
+  "createdAt": "2026-07-23T08:10:29.607Z"
+}
