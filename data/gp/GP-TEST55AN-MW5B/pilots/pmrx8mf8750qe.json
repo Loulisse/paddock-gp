@@ -1,6 +1,12 @@
 {
   "id": "pmrx8mf8750qe",
-  "times": {},
+  "times": {
+    "j1s1": {
+      "ms": 110525,
+      "raw": "1:50.525",
+      "at": "2026-07-23T08:28:49.864Z"
+    }
+  },
   "firstName": "Inviter",
   "lastName": "Moi",
   "nickname": "Test",
@@ -12,5 +18,5 @@
   "photoPilot": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794557/aqkrydn7mdj7co3bi10d.jpg",
   "photoBike": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784794596/zpq3judwdkwr5qdnoa98.jpg",
   "isDirector": false,
-  "updatedAt": "2026-07-23T08:27:09.775Z"
+  "updatedAt": "2026-07-23T08:28:49.864Z"
 }
