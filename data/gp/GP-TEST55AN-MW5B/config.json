@@ -9,6 +9,10 @@
     {
       "id": "j1s1",
       "label": "J1 - Session 1"
+    },
+    {
+      "id": "x1",
+      "label": "J2-Session 2"
     }
   ],
   "status": "live",
