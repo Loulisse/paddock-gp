@@ -350,7 +350,7 @@ var CONFIG = {
 function parseTime(str){
   if(str === null || str === undefined) return null;
   var s = String(str).trim().replace(",", ".");
-  if(/^\d{1,6}$/.test(s)) return digitsToMs(s);
+  if(/^\d+$/.test(s)) return digitsToMs(s);
   var m = s.match(/^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$/);
   if(!m) return null;
   var min = m[1] ? parseInt(m[1], 10) : 0;
@@ -360,11 +360,14 @@ function parseTime(str){
   var ms = min * 60000 + sec * 1000 + parseInt(frac, 10);
   return ms > 0 ? ms : null;
 }
-function onlyDigits(str){
-  return String(str === null || str === undefined ? "" : str).replace(/\D/g, "").slice(0, 6);
+function lapDigits(str){
+  return String(str === null || str === undefined ? "" : str)
+    .replace(/\D/g, "")
+    .replace(/^0+/, "")
+    .slice(0, 6);
 }
 function digitsToMs(d){
-  var s = onlyDigits(d);
+  var s = lapDigits(d);
   if(!s.length) return null;
   var p = s.padStart(6, "0");
   var min = parseInt(p.slice(0, 1), 10);
@@ -375,7 +378,7 @@ function digitsToMs(d){
   return ms > 0 ? ms : null;
 }
 function maskLap(raw){
-  var s = onlyDigits(raw);
+  var s = lapDigits(raw);
   if(!s.length) return "";
   var p = s.padStart(6, "0");
   return p.slice(0, 1) + ":" + p.slice(1, 3) + "." + p.slice(3, 6);
@@ -1035,8 +1038,9 @@ $("btnRefresh").addEventListener("click", refreshLive);
 $("btnSaveTime").addEventListener("click", saveMyTime);
 $("tTime").addEventListener("input", function(){
   var el = $("tTime");
-  el.value = maskLap(el.value);
-  el.setSelectionRange(el.value.length, el.value.length);
+  var masked = maskLap(el.value);
+  if(el.value !== masked) el.value = masked;
+  try{ el.setSelectionRange(el.value.length, el.value.length); }catch(e){}
   var ms = parseTime(el.value);
   $("tErr").textContent = (el.value && ms === null) ? "Secondes impossibles (max 59)." : "";
 });
