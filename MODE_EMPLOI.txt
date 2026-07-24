@@ -16,8 +16,8 @@ POUR LE RACE DIRECTOR (le patron)
 6. Pendant le week-end tu peux ajouter des sessions depuis
    le panneau "Race director" en bas du live timing.
 7. Dimanche soir : "Fin du GP - drapeau a damier".
-   -> Podium, resume, et TON meilleur temps du week-end se
-   grave automatiquement dans ton palmares sous le circuit.
+   -> Podium (au cumul), resume, et TON MEILLEUR TOUR du
+   week-end se grave dans ton palmares sous le circuit.
    S'il bat ton record de l'annee passee, tu le sauras.
 
 POUR LES PILOTES INVITES
@@ -26,17 +26,40 @@ POUR LES PILOTES INVITES
 2. Entre le code donne par le race director.
 3. Cree ta carte pilote : surnom, numero, ecurie, couleur,
    photos de toi et de ta bete.
-4. Apres chaque session, entre ton meilleur tour au format
-   1:43.256 - l'app garde toujours ton meilleur chrono.
+4. Apres chaque session, entre ton meilleur tour : tape
+   SEULEMENT LES CHIFFRES, l'app met les separateurs.
+   Exemple : tu tapes 143256 -> l'app ecrit 1:43.256
+             tu tapes 58402  -> l'app ecrit 0:58.402
+   L'app garde toujours ton meilleur chrono de la session.
 5. Le live timing se met a jour tout seul toutes les 5 min
    (bouton "Actualiser" pour forcer).
-6. Le VIOLET = meilleur tour absolu du week-end. La ligne
+6. Onglet GENERAL = total cumule de toutes les sessions.
+   Celui qui a couru le plus de sessions passe devant :
+   impossible de gagner en sechant les sessions difficiles.
+   Onglets par session = le meilleur tour de chacun.
+7. Le VIOLET = meilleur tour absolu du week-end. La ligne
    bleutee = toi.
 
 POUR LES SPECTATEURS
 ----------------------------------
 Lien de l'app > "Mode spectateur" > code du GP.
-Ils voient tout, ne touchent a rien.
+Ils voient le live timing ET la grille de depart
+(bouton "Voir la grille de depart") : toutes les cartes
+pilotes, photos, ecuries, numeros et meilleurs tours.
+Ils ne peuvent rien modifier.
+
+LA GRILLE DE DEPART
+----------------------------------
+Depuis le live timing, "Voir la grille de depart" affiche
+la carte de chaque pilote inscrit, classee par numero.
+Accessible aux pilotes comme aux spectateurs. Seule ta
+propre carte reste modifiable, via "Modifier ma carte".
+
+L'HISTORIQUE
+----------------------------------
+Sur l'accueil, "Historique des grands prix" liste tous les
+week-ends termines : pour chacun, le meilleur tour de
+chaque pilote, du plus rapide au plus lent.
 
 BON A SAVOIR
 ----------------------------------
@@ -45,7 +68,12 @@ BON A SAVOIR
   temps du week-end.
 - Ton chrono par session = ton MEILLEUR tour. Si tu entres
   un temps plus lent, l'app garde l'ancien.
-- Format des temps : 1:43.256 (ou 58.402 si tu es un alien).
+- Saisie des temps : que des chiffres, dans l'ordre
+  minute / secondes / millisiemes. Pas de deux-points ni
+  de point a taper. Une erreur ? Efface et retape.
+
+Si tu recharges la page en plein week-end, l'app te
+remet exactement ou tu etais.
 
 Bonne piste, et que le meilleur gagne.
 ============================================================

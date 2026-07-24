@@ -6,6 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0B1220">
+<meta name="apple-mobile-web-app-title" content="Paddock GP">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <title>PADDOCK GP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -129,6 +133,14 @@ input,select,textarea{font-family:"Barlow",sans-serif}
 .pod.b{padding-top:12px}.pod.b .medal{color:#D08A4E}
 .banner{background:var(--purple);color:#160B24;font-family:"Chakra Petch";font-weight:700;font-style:italic;text-transform:uppercase;letter-spacing:.06em;text-align:center;padding:12px;margin-bottom:14px}
 
+.hgp{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--red);padding:12px 14px;margin-bottom:10px}
+.hgp h4{font-family:"Chakra Petch";font-style:italic;font-size:16px;text-transform:uppercase;letter-spacing:.02em}
+.hgp .d{font-size:12px;color:var(--muted);margin-bottom:8px}
+.hgp .r{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.hgp .r i{font-style:normal;font-family:"Chakra Petch";font-weight:700;color:var(--muted);width:18px;flex:none}
+.hgp .r span{flex:1;text-transform:uppercase;font-family:"Chakra Petch";font-style:italic;font-size:14px}
+.hgp .r b{font-family:"Chakra Petch";font-weight:700;font-variant-numeric:tabular-nums;color:var(--purple)}
+.gridwrap .pcard{margin-bottom:12px}
 .toast{position:fixed;left:16px;right:16px;bottom:calc(var(--sab) + 16px);background:var(--ink);color:var(--asphalt);font-family:"Chakra Petch";font-weight:600;font-size:14px;padding:13px 16px;z-index:50;display:none;text-align:center}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid var(--muted);border-top-color:var(--red);border-radius:50%;animation:rot .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes rot{to{transform:rotate(360deg)}}
@@ -164,6 +176,8 @@ a{color:var(--ink)}
   <div class="card-panel">
     <div class="eyebrow"><span class="tick"></span>Palmar&egrave;s &mdash; records du patron</div>
     <div id="recordsList"><div class="subtle">Chargement...</div></div>
+    <div style="height:10px"></div>
+    <button class="btn ghost" id="btnHistory">Historique des grands prix</button>
   </div>
 </section>
 
@@ -279,6 +293,8 @@ a{color:var(--ink)}
     <button class="btn ghost mini" id="btnRefresh">Actualiser</button>
   </div>
 
+  <button class="btn ghost" id="btnGrid" style="margin-bottom:14px">Voir la grille de d&eacute;part</button>
+
   <div class="tabs" id="sessionTabs"></div>
   <div id="timingBoard"></div>
   <div class="legend" id="boardLegend"><i></i>Meilleur tour du week-end</div>
@@ -305,6 +321,27 @@ a{color:var(--ink)}
   </div>
 
   <button class="btn ghost" data-back="s-home">Quitter le paddock</button>
+</section>
+
+<!-- ================= GRILLE DE DEPART ================= -->
+<section class="screen" id="s-grid">
+  <div class="card-panel" style="padding:12px 16px">
+    <div class="eyebrow"><span class="tick"></span>Grille de d&eacute;part</div>
+    <h2 class="disp" id="gridCircuit" style="font-style:italic;text-transform:uppercase;font-size:19px">&mdash;</h2>
+    <div class="subtle" id="gridCount">&mdash;</div>
+  </div>
+  <div id="gridList"></div>
+  <button class="btn ghost" id="btnGridBack">Retour au live timing</button>
+</section>
+
+<!-- ================= HISTORIQUE ================= -->
+<section class="screen" id="s-history">
+  <div class="card-panel" style="padding:12px 16px">
+    <div class="eyebrow"><span class="tick"></span>Historique des grands prix</div>
+    <div class="subtle">Meilleur tour de chaque pilote, week-end par week-end.</div>
+  </div>
+  <div id="historyList"><div class="card-panel subtle">Chargement...</div></div>
+  <button class="btn ghost" data-back="s-home">Retour</button>
 </section>
 
 <!-- ================= RESUME / FIN DU GP ================= -->
@@ -338,8 +375,8 @@ var CONFIG = {
   GH_OWNER: "Loulisse",
   GH_REPO: "paddock-gp",
   GH_BRANCH: "main",
-  TOKEN_PART_1: "github_pat_11BCOM3GA0XdH0vpSYovEO_LZHQQ",
-  TOKEN_PART_2: "Wzqs5zRbmqh3oOOr3CTvQyWlexgqdACA9KixhUEIE2TTXAutXZN0bs",
+  TOKEN_PART_1: "COLLER_LA_PREMIERE_MOITIE_DU_TOKEN_ICI",
+  TOKEN_PART_2: "COLLER_LA_SECONDE_MOITIE_DU_TOKEN_ICI",
   DIRECTOR_PIN: "2356",
   CLOUDINARY_CLOUD: "ddn6im7rn",
   CLOUDINARY_PRESET: "paddock_gp",
@@ -651,9 +688,139 @@ async function loadRecords(){
   return r ? r.json : { circuits: {} };
 }
 
+/* ===================== Grille de depart ===================== */
+function photoHtml(url, kind, label){
+  var cls = kind === "pilot" ? "ph pilot" : "ph bike";
+  return url ? "<div class=\"" + cls + "\"><img src=\"" + esc(url) + "\" alt=\"\"></div>"
+             : "<div class=\"" + cls + "\">" + label + "</div>";
+}
+function pilotCardHtml(p){
+  var best = bestOfPilot(p);
+  var full = ((p.firstName || "") + " " + (p.lastName || "")).trim();
+  var flag = p.country ? (flagFromCode(p.country) + " " + p.country) : "-";
+  return "<div class=\"pcard\" style=\"--team:" + esc(p.color || "#E8332A") + "\">"
+    + "<div class=\"spine\"></div>"
+    + "<div class=\"bignum\">" + esc(p.number || "?") + "</div>"
+    + "<div class=\"row\">" + photoHtml(p.photoPilot, "pilot", "PILOTE") + photoHtml(p.photoBike, "bike", "MOTO") + "</div>"
+    + "<div class=\"nick\">" + esc(p.nickname || full || "-") + "</div>"
+    + "<div class=\"real\">" + esc(full || "-") + (p.isDirector ? " &middot; race director" : "") + "</div>"
+    + "<div><span class=\"teamchip\">" + esc(p.team || "Prive") + "</span></div>"
+    + "<div class=\"stats\">"
+    + "<div class=\"stat\"><b>" + esc(p.bike || "-") + "</b><span>Machine</span></div>"
+    + "<div class=\"stat\"><b>" + flag + "</b><span>Nation</span></div>"
+    + "<div class=\"stat\"><b>" + (best !== null ? formatMs(best) : "-") + "</b><span>Meilleur tour</span></div>"
+    + "</div></div>";
+}
+async function enterGrid(){
+  show("s-grid");
+  saveNav("s-grid");
+  $("gridCircuit").textContent = S.gp.circuit;
+  $("gridList").innerHTML = "<div class=\"card-panel subtle\"><span class=\"spin\"></span>Chargement de la grille...</div>";
+  try{
+    S.pilots = await loadPilots(S.gpCode);
+  }catch(e){
+    $("gridList").innerHTML = "<div class=\"card-panel subtle\">Impossible de charger la grille : " + esc(e.message) + "</div>";
+    return;
+  }
+  var list = S.pilots.slice().sort(function(a, b){
+    var na = parseInt(a.number, 10), nb = parseInt(b.number, 10);
+    if(isNaN(na)) na = 9999;
+    if(isNaN(nb)) nb = 9999;
+    return na - nb;
+  });
+  $("gridCount").textContent = list.length + (list.length > 1 ? " pilotes inscrits" : " pilote inscrit");
+  if(!list.length){
+    $("gridList").innerHTML = "<div class=\"card-panel subtle\">Personne sur la grille pour l'instant.</div>";
+    return;
+  }
+  var h = "<div class=\"gridwrap\">";
+  for(var i = 0; i < list.length; i++) h += pilotCardHtml(list[i]);
+  $("gridList").innerHTML = h + "</div>";
+}
+
+/* ===================== Historique des GP ===================== */
+function archiveRiders(a){
+  var out = [];
+  var g = a.general || [];
+  for(var i = 0; i < g.length; i++){
+    var ms = (typeof g[i].bestLapMs === "number") ? g[i].bestLapMs : null;
+    out.push({ nickname: g[i].nickname || "-", lap: g[i].bestLap || (ms !== null ? formatMs(ms) : (g[i].best || "-")), ms: ms });
+  }
+  out.sort(function(x, y){
+    if(x.ms === null && y.ms === null) return 0;
+    if(x.ms === null) return 1;
+    if(y.ms === null) return -1;
+    return x.ms - y.ms;
+  });
+  return out;
+}
+async function renderHistory(){
+  show("s-history");
+  $("historyList").innerHTML = "<div class=\"card-panel subtle\"><span class=\"spin\"></span>Chargement...</div>";
+  try{
+    var files = await ghList("data/archives");
+    var archives = [];
+    for(var i = 0; i < files.length; i++){
+      if(files[i].type !== "file" || files[i].name.slice(-5) !== ".json") continue;
+      try{
+        var a = await ghGet("data/archives/" + files[i].name);
+        if(a) archives.push(a.json);
+      }catch(e){ /* archive illisible ignoree */ }
+    }
+    archives.sort(function(x, y){ return String(y.finishedAt || "").localeCompare(String(x.finishedAt || "")); });
+    if(!archives.length){
+      $("historyList").innerHTML = "<div class=\"card-panel subtle\">Aucun grand prix termine pour l'instant. L'historique se remplira au premier drapeau a damier.</div>";
+      return;
+    }
+    var h = "";
+    for(var j = 0; j < archives.length; j++){
+      var a = archives[j];
+      var riders = archiveRiders(a);
+      h += "<div class=\"hgp\"><h4>" + esc(a.circuit || "-") + "</h4>"
+        + "<div class=\"d\">" + esc((a.dates && a.dates.start) || "") + " au " + esc((a.dates && a.dates.end) || "") + " &middot; " + esc(a.code || "") + "</div>";
+      for(var k = 0; k < riders.length; k++){
+        h += "<div class=\"r\"><i>" + (k + 1) + "</i><span>" + esc(riders[k].nickname) + "</span><b>" + esc(riders[k].lap) + "</b></div>";
+      }
+      h += "</div>";
+    }
+    $("historyList").innerHTML = h;
+  }catch(e){
+    $("historyList").innerHTML = "<div class=\"card-panel subtle\">Impossible de charger l'historique : " + esc(e.message) + "</div>";
+  }
+}
+
+/* ===================== Reprise de session ===================== */
+function saveNav(screen){
+  try{ localStorage.setItem("paddock_nav", JSON.stringify({ screen: screen, gpCode: S.gpCode, tab: currentTab })); }catch(e){}
+}
+function clearNav(){
+  try{ localStorage.removeItem("paddock_nav"); }catch(e){}
+}
+async function boot(){
+  var nav = null;
+  try{ nav = JSON.parse(localStorage.getItem("paddock_nav") || "null"); }catch(e){}
+  if(nav && nav.gpCode && (nav.screen === "s-live" || nav.screen === "s-grid" || nav.screen === "s-summary")){
+    try{
+      var cfg = await ghGet("data/gp/" + nav.gpCode + "/config.json");
+      if(cfg){
+        S.gp = cfg.json;
+        S.gpCode = nav.gpCode;
+        S.role = localStorage.getItem("paddock_role") || "";
+        if(nav.tab) currentTab = nav.tab;
+        if(cfg.json.status === "finished"){ await renderSummaryFromArchive(); return; }
+        if(nav.screen === "s-grid"){ await enterGrid(); return; }
+        await enterLive();
+        return;
+      }
+    }catch(e){ /* on retombe sur l'accueil */ }
+  }
+  renderHome();
+}
+
 /* ===================== Accueil ===================== */
 async function renderHome(){
   show("s-home");
+  clearNav();
   setChip("");
   try{
     var active = await loadActiveGp();
@@ -708,6 +875,14 @@ async function createGp(){
   $("gpErr").textContent = "";
   var btn = $("btnCreateGp"); btn.disabled = true;
   try{
+    var idx = await ghGet("data/gp/index.json");
+    if(idx && idx.json.active){
+      var prev = await ghGet("data/gp/" + idx.json.active + "/config.json");
+      if(prev && prev.json.status === "live"){
+        var ok = confirm("Attention : un GP est deja en cours (" + prev.json.circuit + ", code " + idx.json.active + ").\n\nEn ouvrir un nouveau le mettra de cote. Rien n'est supprime : ses chronos restent accessibles avec son code. Continuer ?");
+        if(!ok){ btn.disabled = false; return; }
+      }
+    }
     var code = makeGpCode(circuit);
     var config = { code: code, circuit: circuit, dates: { start: start, end: end }, sessions: defaultSessions(days), status: "live", createdAt: new Date().toISOString() };
     await ghPut("data/gp/" + code + "/config.json", config, "Ouverture " + code);
@@ -823,6 +998,7 @@ async function saveProfile(){
 var currentTab = "general";
 async function enterLive(){
   show("s-live");
+  saveNav("s-live");
   setChip("live");
   $("liveCircuit").textContent = S.gp.circuit;
   $("liveMeta").textContent = "Du " + S.gp.dates.start + " au " + S.gp.dates.end;
@@ -966,7 +1142,7 @@ async function finishGp(){
 
     var archive = {
       code: S.gpCode, circuit: S.gp.circuit, dates: S.gp.dates, finishedAt: new Date().toISOString(),
-      general: general.map(function(r){ return { pos: r.pos, nickname: r.pilot.nickname, number: r.pilot.number, team: r.pilot.team, color: r.pilot.color, ms: r.ms, best: formatMs(r.ms), gap: r.gap, sessions: r.sessions }; }),
+      general: general.map(function(r){ return { pos: r.pos, nickname: r.pilot.nickname, number: r.pilot.number, team: r.pilot.team, color: r.pilot.color, ms: r.ms, best: formatMs(r.ms), gap: r.gap, sessions: r.sessions, bestLapMs: bestOfPilot(r.pilot), bestLap: bestOfPilot(r.pilot) !== null ? formatMs(bestOfPilot(r.pilot)) : null }; }),
       sessions: {}, papaBest: papaBest !== null ? formatMs(papaBest) : null, recordBeaten: upd.beaten, newRecord: upd.saved
     };
     for(var k in perSession){
@@ -985,6 +1161,7 @@ async function finishGp(){
 }
 function renderSummary(a){
   show("s-summary");
+  saveNav("s-summary");
   setChip("finished");
   $("sumCircuit").textContent = a.circuit;
   $("sumDates").textContent = "Du " + a.dates.start + " au " + a.dates.end + " - " + a.code;
@@ -1036,7 +1213,7 @@ async function renderSummaryFromArchive(){
 document.addEventListener("click", function(e){
   var t = e.target;
   if(t.dataset && t.dataset.back){ if(t.dataset.back === "s-home"){ renderHome(); } else { show(t.dataset.back); } return; }
-  if(t.classList.contains("tab")){ currentTab = t.dataset.tab; renderTabs(); renderBoard(); return; }
+  if(t.classList.contains("tab")){ currentTab = t.dataset.tab; saveNav("s-live"); renderTabs(); renderBoard(); return; }
   if(t.classList.contains("sw")){
     var all = document.querySelectorAll(".sw");
     for(var i = 0; i < all.length; i++) all[i].classList.remove("sel");
@@ -1070,6 +1247,9 @@ $("btnEditProfile").addEventListener("click", function(){
   }).catch(function(){ enterProfile(); });
 });
 $("btnRefresh").addEventListener("click", refreshLive);
+$("btnGrid").addEventListener("click", enterGrid);
+$("btnGridBack").addEventListener("click", enterLive);
+$("btnHistory").addEventListener("click", renderHistory);
 $("btnSaveTime").addEventListener("click", saveMyTime);
 $("tTime").addEventListener("input", function(){
   var el = $("tTime");
@@ -1091,7 +1271,7 @@ bindPhotoInput("pPhotoBikeFile", "pPhotoBikeUrl", "cvPhotoBike", "MOTO");
 
 /* ===================== Init ===================== */
 renderColorSwatches(TEAM_COLORS[0]);
-renderHome();
+boot();
 </script>
 </body>
 </html>
