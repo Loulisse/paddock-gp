@@ -1,6 +1,12 @@
 {
   "id": "pms0av0xqzlru",
-  "times": {},
+  "times": {
+    "j1s1": {
+      "ms": 88477,
+      "raw": "1:28.477",
+      "at": "2026-07-25T11:43:09.239Z"
+    }
+  },
   "firstName": "Bryan",
   "lastName": "LEU",
   "nickname": "Farmer racing",
@@ -12,5 +18,5 @@
   "photoPilot": "",
   "photoBike": "",
   "isDirector": false,
-  "updatedAt": "2026-07-25T11:42:39.231Z"
+  "updatedAt": "2026-07-25T11:43:09.240Z"
 }
