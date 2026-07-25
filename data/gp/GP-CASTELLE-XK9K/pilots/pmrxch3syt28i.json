@@ -1,6 +1,12 @@
 {
   "id": "pmrxch3syt28i",
-  "times": {},
+  "times": {
+    "j1s1": {
+      "ms": 112000,
+      "raw": "1:52.000",
+      "at": "2026-07-25T11:53:13.234Z"
+    }
+  },
   "firstName": "Stephane",
   "lastName": "Rohrbach",
   "nickname": "Toot",
@@ -12,5 +18,5 @@
   "photoPilot": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784813947/bgg94k0iu2l67mk9gu5m.jpg",
   "photoBike": "https://res.cloudinary.com/ddn6im7rn/image/upload/v1784813954/b7nyt7otwwgci7qsdcdt.jpg",
   "isDirector": true,
-  "updatedAt": "2026-07-23T13:39:22.718Z"
+  "updatedAt": "2026-07-25T11:53:13.239Z"
 }
