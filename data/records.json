@@ -1,3 +1,11 @@
 {
-  "circuits": {}
+  "circuits": {
+    "Castellet des pinasses": {
+      "ms": 103277,
+      "best": "1:43.277",
+      "date": "2026-07-27",
+      "gp": "GP-CASTELLE-XK9K",
+      "history": []
+    }
+  }
 }
