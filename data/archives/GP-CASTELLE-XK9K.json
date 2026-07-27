@@ -1,0 +1,53 @@
+{
+  "code": "GP-CASTELLE-XK9K",
+  "circuit": "Castellet des pinasses",
+  "dates": {
+    "start": "2026-07-25",
+    "end": "2026-07-26"
+  },
+  "finishedAt": "2026-07-27T13:22:38.914Z",
+  "general": [
+    {
+      "pos": 1,
+      "nickname": "Farmer racing",
+      "number": "34",
+      "team": "",
+      "color": "#1E62D0",
+      "ms": 88477,
+      "best": "1:28.477",
+      "gap": 0,
+      "sessions": 1,
+      "bestLapMs": 88477,
+      "bestLap": "1:28.477"
+    },
+    {
+      "pos": 2,
+      "nickname": "Toot",
+      "number": "314",
+      "team": "Me-Myself-I",
+      "color": "#E8332A",
+      "ms": 103277,
+      "best": "1:43.277",
+      "gap": 14800,
+      "sessions": 1,
+      "bestLapMs": 103277,
+      "bestLap": "1:43.277"
+    }
+  ],
+  "sessions": {
+    "j1s1": {
+      "label": "J1 - Session 1",
+      "winner": {
+        "nickname": "Farmer racing",
+        "best": "1:28.477"
+      }
+    },
+    "j2s1": {
+      "label": "J2 - Session 1",
+      "winner": null
+    }
+  },
+  "papaBest": "1:43.277",
+  "recordBeaten": false,
+  "newRecord": true
+}
